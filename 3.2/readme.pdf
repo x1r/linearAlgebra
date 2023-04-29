@@ -1,0 +1,147 @@
+Напиши на питоне
+Условие:
+Описание:
+Вы играете роль капитана небольшого пиратского парусного судна, вооруженного двумя пушками, каждая из которых обороняет свой борт. Волнения на море нет, однако дует сильный боковой ветер, раскачивающий судно. К сожалению, в данный момент экипаж судна попал в переделку, столкнувшись с несколькими вражескими кораблями. В бою Вашей задачей является координировать действия артиллеристов, указывая с какого борта и под каким углом к направлению движения вашего судна, c поправкой на наклон, требуется произвести залп чтобы потопить вражеский корабль. Считаем, что пушки можно поворачивать на угол  вправо или влево от нормали к борту, -60°<ξ<60°. Положительный угол отсчитывается в направлении движения корабля. Если требуется повернуть на угол, больший по модулю чем 60°, считаем, что ориентация корабля не позволяет сделать выстрел. Нос корабля, мачта и нормаль к борту попарно перпендикулярны. Мачта может быть наклонена как между бортами, так и от носа к килю (и наоборот).
+
+Состояние описывается следующими параметрами:
+
+v = (vx, vy, 0) - радиус-вектор, определяющий положение вашего корабля. Считаем, что море представляет из себя плоскость ;
+a = (ax, ay, 0) - вектор, определяющий ориентацию киля (направление носа относительно центра корабля);
+m = (mx, my, 1) - вектор направления мачты (мачта установлена в центре корабля);
+w = (wx, wy, 0) - радиус-вектор, определяющий положение корабля противника.
+Формат входных данных (файл input.txt)
+Файл input.txt содержит ровно четыре строчки в указанном порядке:
+
+vx, vy - вещественные числа, первые две координаты вектора v;
+ax, ay - вещественные числа, первые две координаты вектора a;
+mx,my - вещественные числа, первые две координаты вектора m;
+wx,wy - вещественные числа, первые две координаты вектора w
+.
+Все числа внутри каждой из строк разделены ровно одним пробелом. Гарантируется, что каждое из них можно преобразовать при помощи вызова float(...) из стандартной библиотеки Python.
+
+На входные данные также накладываются следующие ограничения:
+Формат выходных данных (файл output.txt)
+Файл output.txt должен содержать ровно четыре строки в указанном порядке:
+
+s - борт корабля, пушкой с которого возможно сделать выстрел: 1 (если борт левый), -1 (если борт правый) или 0 (если при данном расположении и ориентации кораблей выстрел сделать невозможно). В случае, если выстрел возможно произвести любой пушкой, можно вывести как 1, так и -1;
+ξ - угол поворота пушки, отсчитываемый от нормали к борту в плоскости моря (от -60° до 60°), выраженный в градусах. В случае, если выстрел произвести невозможно, выведите ноль на этой строке;
+α - угол наклона мачты, отсчитываемый от вертикали (в границах от -90° до 90°), выраженный в градусах. Вывести его нужно вне зависимости от возможности выстрела;
+w - любое прощальное (или напутственное) слово (желательно приличное). Вывести его нужно вне зависимости от возможности выстрела.
+В случае, если строка содержит более одного числа, все числа в строке необходимо разделить ровно одним пробелом. Гарантируется, что число с плавающей запятой f будет преобразовано в строку корректно, если использовать стандартный вызов str(f). Слово - непустая последовательность непробельных символов.
+
+Примеры:
+Файл input.txt:
+0 0
+1 0
+0 0
+3 4
+Соответствующий ему файл output.txt:
+1
+36.87
+0
+Bye
+
+У меня есть код программы, исправь его:
+import math
+
+
+def length(x: float, y: float, z: float) -> float:
+    return math.sqrt(x ** 2 + y ** 2 + z ** 2)
+
+
+def angle(a: float, b: float, c: float, x: float, y: float, z: float) -> float:
+    return math.degrees(math.acos(round((a * x + b * y + c * z) / (length(a, b, c) * length(x, y, z)), 2)))
+
+
+def angle_2d(a: float, b: float, c: float, d: float) -> float:
+    return math.degrees(math.acos(float((a * c + b * d) / (math.sqrt(a ** 2 + b ** 2) * math.sqrt(c ** 2 + d ** 2)))))
+
+
+def dot_product_2d(x: list[float], y: list[float]) -> float:
+    return sum(x[i] * y[i] for i in range(2))
+
+
+def minus_vector(a: float, b: float, x: float, y: float) -> float:
+    return a * b - x * y
+
+
+def multiply_vectors(x: list[float], y: list[float]) -> list:
+    return [minus_vector(x[1], y[2], x[2], y[1]), minus_vector(x[2], y[0], x[0], y[2]),
+            minus_vector(x[0], y[1], x[1], y[0])]
+
+
+def dot_product(x: list[float], y: list[float]) -> float:
+    return x[0] * y[0] + x[1] * y[1] + x[2] * y[2]
+
+
+def beam_check(rv: list[float], kv: list[float], elv: list[float]) -> float:
+    if elv[0] == rv[0] and elv[1] == rv[1]:
+        return 1
+    if kv[0] == 0:
+        return 1 if (elv[0] <= rv[0] and kv[1] > 0) or (elv[0] > rv[0] and kv[1] <= 0) else -1
+    elif kv[0] != 0:
+        v = kv[1] / kv[0] * (elv[0] - rv[0]) + rv[1]
+        if kv[1] / kv[0] > 0:
+            return 1 if (elv[1] > v and kv[0] > 0) or (elv[1] <= v and kv[0] <= 0) else -1
+        else:
+            return 1 if (elv[1] > v and kv[0] > 0) or (elv[1] <= v and kv[0] <= 0) else -1
+
+
+def keel_angle(rv: list[float], kv: list[float], mv: list[float], elv: list[float]) -> float:
+    alpha = 90
+    enemy = [elv[i] - rv[i] for i in range(3)]
+    enemy[2] = dot_product_2d(rv, mv) - dot_product_2d(elv, mv)
+    if elv[2] < 0:
+        return alpha
+    kv[2] = -dot_product_2d(kv, mv)
+    if all(mv[i] == 0 for i in range(2)):
+        if (kv[0] != enemy[0] or kv[1] != enemy[1]) and (kv[0] != -enemy[0] or kv[1] != -enemy[1]):
+            return alpha - angle_2d(kv[0], kv[1], enemy[0], enemy[1])
+    else:
+        if all(enemy[i] != kv[i] for i in range(3)) or all(enemy[i] != -kv[i] for i in range(3)):
+            return alpha - angle(*kv, *enemy)
+    return alpha
+
+
+def mast_angle(kv, mv):
+    if all(i == 0 for i in mv[0:2]):
+        return 0
+    if not ((1 if kv[0] == mv[0] == 0 else math.pi if kv[0] * mv[0] == 0 else kv[0] / mv[0]) == (1 if kv[1] == mv[1] == 0 else math.pi if kv[1] * mv[1] == 0 else kv[1] / mv[1]) and sum(kv[i] * mv[i] for i in range(2)) == 0):
+        return 90 - math.degrees(math.atan(1/sum(mv[i] ** 2 for i in range(2))**(1/2)))
+
+
+def solution():
+    with open('input.txt', 'r') as input_file, open('output.txt', 'w') as output_file:
+        radius_vector = list(map(float, input_file.readline().split()))
+        keel_vector = list(map(float, input_file.readline().split()))
+        mast_vector = list(map(float, input_file.readline().split()))
+        enemy_location_vector = list(map(float, input_file.readline().split()))
+        radius_vector.append(float(0))
+        keel_vector.append(float(0))
+        mast_vector.append(float(1))
+        enemy_location_vector.append(float(0))
+
+        beta = mast_angle(keel_vector, mast_vector)
+
+        beam = beam_check(radius_vector, keel_vector, enemy_location_vector)
+        alpha = keel_angle(radius_vector, keel_vector, mast_vector, enemy_location_vector)
+        # print(alpha, beta, beam)
+        if math.fabs(alpha) <= 60:
+            if math.fabs(beta) > 60:
+                print(f"0\n{alpha:.2f}\n{beta:.2f}", file=output_file)
+            else:
+                print(f"{beam}\n{alpha:.2f}\n{beta:.2f}", file=output_file)
+        else:
+            print(f"0\n{alpha:.2f}\n{beta:.2f}", file=output_file)
+        output_file.write("Depression")
+
+
+def main():
+    solution()
+
+
+if __name__ == "__main__":
+    main()
+
+
+
